@@ -1,37 +1,37 @@
-name: Deploy v3lclbshu App to GitHub Pages
+name: Deploy Vue App to GitHub Pages
 
 on:
   push:
-    branches:
-      - main # 如果你的主分支叫 master，请改成 master
+    branches: [main] # 如果你的主分支是 master，请把 main 改成 master
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 下载代码
+      # 1. 检出代码
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. 安装 Node.js (版本 18 比较稳)
-      - name: Setup Node
+      # 2. 设置 Node.js 版本（关键！强制使用 20.x，兼容 Vite）
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20' # 选 20 或 22 都可以
+          cache: 'npm' # 开启缓存，加速构建
 
       # 3. 安装依赖
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
-      # 4. 打包项目
+      # 4. 构建项目 (Vite 默认会生成 dist 目录)
       - name: Build
         run: npm run build
 
-      # 5. 发布到 gh-pages 分支
+      # 5. 部署到 GitHub Pages
+      # 注意：这里的关键是使用 ${{ secrets.GITHUB_TOKEN }}，它拥有写入权限
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # ⚠️ 注意：Umi 默认打包到 dist 目录，所以这里写 ./dist
-          publish_dir: ./dist
+          publish_dir: ./dist # 确保这是你构建后的文件夹
