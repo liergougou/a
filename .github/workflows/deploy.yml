@@ -4,6 +4,11 @@ on:
   push:
     branches: [main] # 如果你的主分支是 master，请把 main 改成 master
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -22,7 +27,7 @@ jobs:
 
       # 3. 安装依赖
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       # 4. 构建项目 (Vite 默认会生成 dist 目录)
       - name: Build
@@ -35,3 +40,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist # 确保这是你构建后的文件夹
+          publish_branch: gh-pages
+          clean: true
+          allow_empty_commit: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
